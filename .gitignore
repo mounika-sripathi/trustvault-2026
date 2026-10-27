@@ -2,5 +2,8 @@ node_modules/
 .env
 .supabase-db-password.txt
 demo/out/
+demo/segments/
+demo/voice/
+demo/qa/
 *.log
 .DS_Store

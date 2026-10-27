@@ -1,0 +1,16 @@
+{
+ "lines": [
+  {
+   "t": "cmd",
+   "text": "curl -X PATCH \\\n  'https://dymcermbpcbthimiokba.supabase.co/rest/v1/audit_log?seq=eq.1' \\\n  -H \"apikey: $ANON\" -H \"Authorization: Bearer $ADMIN_TOKEN\" \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"action\": \"doc.download\"}'"
+  },
+  {
+   "t": "out",
+   "text": "HTTP 403\n{\"code\":\"42501\",\"message\":\"permission denied for table audit_log\",\n \"hint\":\"Grant the required privileges to the current role with:\n   GRANT UPDATE ON public.audit_log TO authenticated;\"}"
+  },
+  {
+   "t": "out",
+   "text": "# UPDATE privilege is revoked from every client role; a trigger also\n# rejects UPDATE/DELETE for every role \u2014 including the DB owner.\n# The audit trail cannot be quietly altered."
+  }
+ ]
+}

@@ -11,7 +11,7 @@ access takes effect on the person's very next request.
 
 The deployed instance (with seed data):
 
-**https://trustvault.mounika-sripathi.workers.dev** — see the URL in the
+**https://trust-vault.pplx.app** — see the URL in the
 "Deployment" section of this README for the current address, and use the
 credentials below.
 

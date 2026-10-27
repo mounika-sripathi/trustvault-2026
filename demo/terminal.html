@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>terminal</title>
+<style>
+  html,body{margin:0;height:100%;background:#0d1117;}
+  body{font:14px/1.55 ui-monospace,Menlo,Consolas,monospace;color:#c9d1d9;padding:26px 34px;box-sizing:border-box;}
+  .bar{display:flex;gap:8px;align-items:center;margin-bottom:18px;color:#8b949e;font-size:12px;}
+  .dot{width:11px;height:11px;border-radius:50%;}
+  .r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+  .title{margin-left:8px}
+  .cmd{color:#7ee787;white-space:pre-wrap;word-break:break-all;}
+  .cmd::before{content:"$ ";color:#8b949e;}
+  .out{white-space:pre-wrap;color:#c9d1d9;word-break:break-all;}
+  .out.dim{color:#8b949e}
+  #scr{height:calc(100vh - 78px);overflow-y:auto;}
+  .cursor{display:inline-block;width:8px;height:16px;background:#c9d1d9;vertical-align:text-top;animation:bl 1s steps(1) infinite;}
+  @keyframes bl{50%{opacity:0}}
+</style>
+</head>
+<body>
+<div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="title">trustvault — bash</span></div>
+<div id="scr"></div>
+<script>
+const QS = new URLSearchParams(location.search);
+const DATA_URL = QS.get("data") || "../assets/tests.json";
+const SPEED = parseFloat(QS.get("speed") || "18");   // ms per char for typing
+const LINE_DELAY = parseFloat(QS.get("linedelay") || "260"); // ms between lines
+const scr = document.getElementById("scr");
+let done;
+window.terminalDone = new Promise(r => done = r);
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+(async () => {
+  const data = await (await fetch(DATA_URL)).json();
+  for (const line of data.lines) {
+    const div = document.createElement("div");
+    div.className = line.t === "cmd" ? "cmd" : "out" + (line.dim ? " dim" : "");
+    const cur = document.createElement("span");
+    cur.className = "cursor";
+    div.appendChild(cur);
+    scr.appendChild(div);
+    const text = line.text;
+    for (let i = 0; i <= text.length; i++) {
+      cur.insertAdjacentText("beforebegin", text[i - 1] ?? "");
+      if (line.t === "cmd") await sleep(SPEED);
+      else await sleep(text.length > 60 ? 8 : 22);
+    }
+    cur.remove();
+    if (line.t !== "cmd") await sleep(LINE_DELAY);
+    else await sleep(500);
+    scr.scrollTop = scr.scrollHeight;
+  }
+  const cur = document.createElement("span");
+  cur.className = "cursor";
+  scr.appendChild(cur);
+  done();
+})();
+</script>
+</body>
+</html>

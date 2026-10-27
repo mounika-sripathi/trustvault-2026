@@ -1,0 +1,144 @@
+{
+ "lines": [
+  {
+   "t": "cmd",
+   "text": "node --test tests/integration.test.mjs"
+  },
+  {
+   "t": "out",
+   "text": "ok 1 - wrong password is rejected"
+  },
+  {
+   "t": "out",
+   "text": "ok 2 - viewer cannot use admin RPCs (verify_audit_chain)"
+  },
+  {
+   "t": "out",
+   "text": "ok 3 - viewer cannot list documents they have no grant on"
+  },
+  {
+   "t": "out",
+   "text": "ok 4 - viewer cannot fetch another user's document by id (IDOR)"
+  },
+  {
+   "t": "out",
+   "text": "ok 5 - viewer cannot download another user's document via serve-doc"
+  },
+  {
+   "t": "out",
+   "text": "ok 6 - viewer cannot see document versions of ungranted documents"
+  },
+  {
+   "t": "out",
+   "text": "ok 7 - viewer cannot read live grants of an ungranted document"
+  },
+  {
+   "t": "out",
+   "text": "ok 8 - viewer cannot edit metadata of an ungranted document"
+  },
+  {
+   "t": "out",
+   "text": "ok 9 - viewer cannot delete another user's document"
+  },
+  {
+   "t": "out",
+   "text": "ok 10 - viewer cannot forge an audit entry"
+  },
+  {
+   "t": "out",
+   "text": "ok 11 - viewer cannot read the audit log"
+  },
+  {
+   "t": "out",
+   "text": "ok 12 - viewer cannot escalate their role via profiles"
+  },
+  {
+   "t": "out",
+   "text": "ok 13 - viewer cannot grant themselves access (grant forgery)"
+  },
+  {
+   "t": "out",
+   "text": "ok 14 - storage objects are not directly downloadable (private bucket, no policies)"
+  },
+  {
+   "t": "out",
+   "text": "ok 15 - grant \u2192 access works; revoke \u2192 the very next request is refused"
+  },
+  {
+   "t": "out",
+   "text": "ok 16 - revoked grants cannot be re-activated \u2014 a new grant row is required"
+  },
+  {
+   "t": "out",
+   "text": "ok 17 - edit-grant holder can change title but not owner, status or storage path"
+  },
+  {
+   "t": "out",
+   "text": "ok 18 - edit-grant holder cannot grant access to others (only the owner can)"
+  },
+  {
+   "t": "out",
+   "text": "ok 19 - read-only grant holder can download current version but not old ones"
+  },
+  {
+   "t": "out",
+   "text": "ok 20 - viewers cannot upload documents"
+  },
+  {
+   "t": "out",
+   "text": "ok 21 - uploads with disallowed content types are rejected"
+  },
+  {
+   "t": "out",
+   "text": "ok 22 - uploads whose magic bytes contradict the declared type are rejected"
+  },
+  {
+   "t": "out",
+   "text": "ok 23 - uploads over 25 MB are rejected"
+  },
+  {
+   "t": "out",
+   "text": "ok 24 - storage paths are server-generated and validated"
+  },
+  {
+   "t": "out",
+   "text": "ok 25 - admin can read the audit log and it contains grants, uploads and denials"
+  },
+  {
+   "t": "out",
+   "text": "ok 26 - the hash chain verifies"
+  },
+  {
+   "t": "out",
+   "text": "ok 27 - audit rows cannot be updated or deleted by any client role"
+  },
+  {
+   "t": "out",
+   "text": "ok 28 - denied downloads are recorded with the refusing actor"
+  },
+  {
+   "t": "out",
+   "text": "ok 29 - search by name, owner, category and date range"
+  },
+  {
+   "t": "out",
+   "text": "ok 30 - deactivating a user revokes all their grants immediately"
+  },
+  {
+   "t": "out",
+   "text": "ok 31 - suggestions are owner-only and are only suggestions"
+  },
+  {
+   "t": "out",
+   "text": "# tests 31\n# pass 31\n# fail 0"
+  },
+  {
+   "t": "cmd",
+   "text": "git log --oneline | wc -l && node tests/ui-smoke.mjs"
+  },
+  {
+   "t": "out",
+   "text": "7\nUI smoke: all green (login, filters, upload, grants, audit, admin screens)"
+  }
+ ]
+}

@@ -1,0 +1,31 @@
+ok 1 - wrong password is rejected
+ok 2 - viewer cannot use admin RPCs (verify_audit_chain)
+ok 3 - viewer cannot list documents they have no grant on
+ok 4 - viewer cannot fetch another user's document by id (IDOR)
+ok 5 - viewer cannot download another user's document via serve-doc
+ok 6 - viewer cannot see document versions of ungranted documents
+ok 7 - viewer cannot read live grants of an ungranted document
+ok 8 - viewer cannot edit metadata of an ungranted document
+ok 9 - viewer cannot delete another user's document
+ok 10 - viewer cannot forge an audit entry
+ok 11 - viewer cannot read the audit log
+ok 12 - viewer cannot escalate their role via profiles
+ok 13 - viewer cannot grant themselves access (grant forgery)
+ok 14 - storage objects are not directly downloadable (private bucket, no policies)
+ok 15 - grant → access works; revoke → the very next request is refused
+ok 16 - revoked grants cannot be re-activated — a new grant row is required
+ok 17 - edit-grant holder can change title but not owner, status or storage path
+ok 18 - edit-grant holder cannot grant access to others (only the owner can)
+ok 19 - read-only grant holder can download current version but not old ones
+ok 20 - viewers cannot upload documents
+ok 21 - uploads with disallowed content types are rejected
+ok 22 - uploads whose magic bytes contradict the declared type are rejected
+ok 23 - uploads over 25 MB are rejected
+ok 24 - storage paths are server-generated and validated
+ok 25 - admin can read the audit log and it contains grants, uploads and denials
+ok 26 - the hash chain verifies
+ok 27 - audit rows cannot be updated or deleted by any client role
+ok 28 - denied downloads are recorded with the refusing actor
+ok 29 - search by name, owner, category and date range
+ok 30 - deactivating a user revokes all their grants immediately
+ok 31 - suggestions are owner-only and are only suggestions
