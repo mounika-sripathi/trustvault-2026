@@ -1,0 +1,6 @@
+node_modules/
+.env
+.supabase-db-password.txt
+demo/out/
+*.log
+.DS_Store
