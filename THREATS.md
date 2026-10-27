@@ -73,7 +73,10 @@ period.
 **What stops it:**
 
 - `profiles` UPDATE is admin-only by RLS, plus a trigger re-checks role /
-  `is_active` changes.
+  `is_active` changes. The trigger exempts session-less requests — safe only
+  because RLS separately requires an active session for every client path to
+  profiles, so the sole session-less writer that can reach profile writes is
+  the service role, held only by the admin-gated `vault-admin` edge function.
 - `grants` INSERT is allowed only for the document's owner or an admin (RLS),
   and a validation trigger rejects grants to the owner or to inactive users.
 - `documents` UPDATE for edit-holders is limited by trigger to title, category,

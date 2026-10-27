@@ -583,7 +583,7 @@ async function renderAudit(view) {
     const out = $("#verify-out");
     if (error) return (out.innerHTML = `<div class="banner bad">${esc(error.message)}</div>`);
     out.innerHTML = data.ok
-      ? `<div class="banner ok">Chain verified: ${data.checked} entries, every hash recomputes correctly. The log has not been altered.</div>`
+      ? `<div class="banner ok">Hash chain verified: ${data.checked} entries, every hash recomputes correctly — the log is internally consistent.</div>`
       : `<div class="banner bad">CHAIN BROKEN at seq ${data.first_bad_seq} — entries at or after this point were altered or removed.</div>`;
   });
 

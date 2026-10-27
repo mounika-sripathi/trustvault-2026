@@ -160,7 +160,13 @@ The stack is a Supabase project plus a static frontend.
 ## Demo video
 
 `demo/trustvault-demo.mp4` in this repository walks through sign-in, grants,
-revocation, denied-access auditing and chain verification (5 minutes).
+revocation, denied-access auditing and chain verification (4:14). The two
+terminal scenes are stylized replays of real captured output: the tampering
+sequence mirrors the steps recorded in THREATS.md / DESIGN.md (a live DB
+demonstration of the same steps exists in the project's session log), and the
+tests scene replays the actual `ui-smoke` output captured from a run against
+the live deployment. The mutation test itself was performed live against the
+deployment — the unedited transcript is in `tests/mutation-demo.txt`.
 
 ## Honest gaps
 
@@ -168,3 +174,8 @@ Documented in full in `DESIGN.md` (§ "What is unfinished") and `THREATS.md`
 (§ "Accepted risks"). The short version: no folder/group model (deliberate),
 no public share links (deliberate), failed login attempts are rate-limited by
 Supabase Auth but not recorded in our audit chain, and single-tenant only.
+One engineering gap is also disclosed there: the migrations were applied
+incrementally to the live database during development, so a from-scratch
+replay of all migrations on a fresh Supabase project (the clean-clone
+deployment path) has not been end-to-end verified — `0010` was verified to
+match the live database byte-for-byte, but the full replay remains untested.

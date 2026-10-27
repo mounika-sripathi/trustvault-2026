@@ -1,10 +1,13 @@
 -- 0010: tg_profiles_protect — keep role/is_active changes admin-only.
 --
--- The service-role connection (used only by the admin-gated vault-admin
--- edge function, which re-verifies the caller is an active admin before
--- the key is used) has no auth.uid(), so it is exempt from this check.
--- Every client role still passes through it: viewers cannot update
--- profiles at all, and role / is_active changes remain admin-only.
+-- Note on the exemption: the trigger exempts any request with no user
+-- session (auth.uid() is null). This is safe only because RLS separately
+-- requires an active session for every client path to profiles, so the
+-- only session-less writer that can reach profile writes at all is the
+-- service role — used only by the admin-gated vault-admin edge function,
+-- which re-verifies the caller is an active admin before the key is used.
+-- Every client role still passes through this trigger: viewers cannot
+-- update profiles at all, and role / is_active changes remain admin-only.
 
 create or replace function tv_internal.tg_profiles_protect()
 returns trigger
