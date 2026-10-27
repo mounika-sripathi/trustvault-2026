@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TrustVault — secure document sharing</title>
+  <meta name="description" content="TrustVault: documents only reachable by the people granted them, with a tamper-evident audit trail.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f2a44'/%3E%3Cpath d='M9 16.5l4.2 4.2L23 11' stroke='%237cd98f' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" id="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Trust<b>Vault</b></span>
+    </div>
+    <nav class="tabs" id="nav"></nav>
+    <div class="userbox" id="userbox"></div>
+  </header>
+  <main id="view"></main>
+  <div id="modal-root"></div>
+  <div id="toast-root" aria-live="polite"></div>
+  <script src="config.js"></script>
+  <script src="js/vendor/supabase.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
