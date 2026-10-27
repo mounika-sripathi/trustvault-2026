@@ -104,8 +104,10 @@ read: `UPDATE audit_log SET actor_email=…` or `DELETE FROM audit_log`.
    granted only to `service_role`).
 5. Each row's hash covers the previous row's hash; the admin "verify chain"
    function recomputes the whole chain. Editing one row breaks every later
-   hash; deleting a tail leaves a dangling `prev_hash`; deleting a middle row
-   breaks the link.
+   hash, and deleting a middle row breaks the link. Deleting the **last**
+   row (tail truncation) is *not* detectable from the chain alone — there is
+   no external checkpoint of the head hash in this build; noted below as a
+   residual risk.
 6. Concurrency is serialised with an advisory lock so two simultaneous events
    cannot fork the chain.
 
@@ -116,7 +118,10 @@ chain verifies".
 **Residual (accepted):** an attacker with the database owner's credentials
 could rewrite the chain and recompute hashes — the chain is tamper-*evident*
 against anyone below the DBA, not tamper-*proof* against the DBA. A HMAC with
-a key outside the database would raise the bar; noted as future work. Also:
+a key outside the database would raise the bar; noted as future work. Tail
+truncation (deleting the newest entries) is also undetectable without a
+trusted external record of the head hash — a production build would
+checkpoint it (e.g. daily digest published out-of-band). Also:
 `seq` values come from a sequence, so gaps appear when transactions roll back —
 gaps are normal and the verifier tolerates them (it checks linkage, not
 contiguity).
@@ -136,7 +141,11 @@ admin-only).
 **Residual (accepted):** timing side channels remain in principle (a granted
 download streams bytes; a refused one returns instantly) — accepted as out of
 scope for this build. Also, the *grants you can see* leak the directory (see
-#10).
+#10). One further honest limitation: **only download attempts through
+`serve-doc` are appended to the audit chain when refused** (`doc.download_denied`).
+RLS-filtered metadata reads and direct storage-API denials are blocked, but
+Postgres does not give us a hook to append them to the chain — they are
+visible in Supabase's own logs, not ours. Accepted for this build.
 
 ## 8. Upload attacks
 

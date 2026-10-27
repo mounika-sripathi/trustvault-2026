@@ -71,8 +71,22 @@ for "make the error go away" will happily delete the control causing it.
 
 ## Unfinished / known gaps
 
+- **Timing:** the challenge window was Oct 19–25, 2026, and the brief asked
+  for a deploy early in the week. This build was done in a single session on
+  October 27, 2026 — the window and the "deploy early" requirement are
+  honestly unmet, and the git history (one day of commits) shows it.
+- **Mutation testing, demonstrated:** the challenge says "take one
+  authorisation check out of your code and run your tests — if they still
+  pass, they were not testing anything." We did exactly that against the live
+  deployment: the grant check was removed from the `documents_select` policy,
+  the suite was run (3 cross-user tests failed: viewer listing, IDOR, revoke
+  immediacy), the policy was restored, and the suite went back to 31/31. The
+  unedited transcript is `tests/mutation-demo.txt`.
 - Timing side channels between granted and refused downloads are not
   normalized (accepted, THREATS.md #7).
+- Refusal auditing covers `serve-doc` download attempts only; RLS-filtered
+  metadata reads and direct storage denials are blocked but not appended to
+  our hash chain (accepted, THREATS.md #7).
 - Failed logins are not in our hash chain (Supabase Auth rejects the
   transaction when a client trigger raises; discovered during the build,
   PROMPTS.md Entry 5 follow-up).

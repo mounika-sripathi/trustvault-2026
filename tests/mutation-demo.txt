@@ -1,0 +1,409 @@
+Mutation test — proof that the test suite actually tests authorization
+======================================================================
+
+The challenge says: "We will take one authorisation check out of your code
+and run your tests. If they still pass, they were not testing anything."
+
+The check removed for this demonstration: the live-grant condition in the
+`documents_select` RLS policy (the authorization engine for document reads).
+
+  BEFORE (production):  using (caller_active() and (is_admin() or owner_id = auth.uid()
+                          or (status = 'active' and has_any_grant(id, auth.uid()))))
+  MUTATION APPLIED:     using (caller_active() and (is_admin() or owner_id = auth.uid()
+                          or status = 'active'))
+                         -- the grant check is gone: any active user can now
+                            read every active document.
+
+The mutation was applied to the live database, the suite was run, the
+original policy was restored, and the suite was run again. Both runs are
+reproduced below, unedited. With the check removed, three cross-user tests
+fail (viewer listing, IDOR by id, and revoke-immediacy). With the check
+restored, all 31 pass.
+
+======================================================================
+RUN 1 — node --test tests/integration.test.mjs   (grant check REMOVED)
+======================================================================
+
+TAP version 13
+# Subtest: wrong password is rejected
+ok 1 - wrong password is rejected
+  ---
+  duration_ms: 550.086101
+  ...
+# Subtest: viewer cannot use admin RPCs (verify_audit_chain)
+ok 2 - viewer cannot use admin RPCs (verify_audit_chain)
+  ---
+  duration_ms: 114.971884
+  ...
+# Subtest: viewer cannot list documents they have no grant on
+not ok 3 - viewer cannot list documents they have no grant on
+  ---
+  duration_ms: 36.22489
+  location: '/home/user/workspace/trustvault/tests/integration.test.mjs:105:1'
+  failureType: 'testCodeFailure'
+  error: 'salary letters leaked into list'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/workspace/trustvault/tests/integration.test.mjs:108:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    async Test.run (node:internal/test_runner/test:797:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+# Subtest: viewer cannot fetch another user's document by id (IDOR)
+not ok 4 - viewer cannot fetch another user's document by id (IDOR)
+  ---
+  duration_ms: 38.726331
+  location: '/home/user/workspace/trustvault/tests/integration.test.mjs:112:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    direct id fetch leaked the document
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/workspace/trustvault/tests/integration.test.mjs:114:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    async Test.run (node:internal/test_runner/test:797:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+# Subtest: viewer cannot download another user's document via serve-doc
+ok 5 - viewer cannot download another user's document via serve-doc
+  ---
+  duration_ms: 549.049218
+  ...
+# Subtest: viewer cannot see document versions of ungranted documents
+ok 6 - viewer cannot see document versions of ungranted documents
+  ---
+  duration_ms: 39.81849
+  ...
+# Subtest: viewer cannot read live grants of an ungranted document
+ok 7 - viewer cannot read live grants of an ungranted document
+  ---
+  duration_ms: 66.673108
+  ...
+# Subtest: viewer cannot edit metadata of an ungranted document
+ok 8 - viewer cannot edit metadata of an ungranted document
+  ---
+  duration_ms: 108.720477
+  ...
+# Subtest: viewer cannot delete another user's document
+ok 9 - viewer cannot delete another user's document
+  ---
+  duration_ms: 97.952681
+  ...
+# Subtest: viewer cannot forge an audit entry
+ok 10 - viewer cannot forge an audit entry
+  ---
+  duration_ms: 55.825548
+  ...
+# Subtest: viewer cannot read the audit log
+ok 11 - viewer cannot read the audit log
+  ---
+  duration_ms: 49.389421
+  ...
+# Subtest: viewer cannot escalate their role via profiles
+ok 12 - viewer cannot escalate their role via profiles
+  ---
+  duration_ms: 92.75797
+  ...
+# Subtest: viewer cannot grant themselves access (grant forgery)
+ok 13 - viewer cannot grant themselves access (grant forgery)
+  ---
+  duration_ms: 83.989935
+  ...
+# Subtest: storage objects are not directly downloadable (private bucket, no policies)
+ok 14 - storage objects are not directly downloadable (private bucket, no policies)
+  ---
+  duration_ms: 155.080332
+  ...
+# Subtest: grant → access works; revoke → the very next request is refused
+not ok 15 - grant → access works; revoke → the very next request is refused
+  ---
+  duration_ms: 35.879897
+  location: '/home/user/workspace/trustvault/tests/integration.test.mjs:197:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/workspace/trustvault/tests/integration.test.mjs:202:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    async Test.run (node:internal/test_runner/test:797:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:526:7)
+  ...
+# Subtest: revoked grants cannot be re-activated — a new grant row is required
+ok 16 - revoked grants cannot be re-activated — a new grant row is required
+  ---
+  duration_ms: 149.020612
+  ...
+# Subtest: edit-grant holder can change title but not owner, status or storage path
+ok 17 - edit-grant holder can change title but not owner, status or storage path
+  ---
+  duration_ms: 252.890411
+  ...
+# Subtest: edit-grant holder cannot grant access to others (only the owner can)
+ok 18 - edit-grant holder cannot grant access to others (only the owner can)
+  ---
+  duration_ms: 37.532143
+  ...
+# Subtest: read-only grant holder can download current version but not old ones
+ok 19 - read-only grant holder can download current version but not old ones
+  ---
+  duration_ms: 2502.173738
+  ...
+# Subtest: viewers cannot upload documents
+ok 20 - viewers cannot upload documents
+  ---
+  duration_ms: 353.807992
+  ...
+# Subtest: uploads with disallowed content types are rejected
+ok 21 - uploads with disallowed content types are rejected
+  ---
+  duration_ms: 311.211911
+  ...
+# Subtest: uploads whose magic bytes contradict the declared type are rejected
+ok 22 - uploads whose magic bytes contradict the declared type are rejected
+  ---
+  duration_ms: 206.721693
+  ...
+# Subtest: uploads over 25 MB are rejected
+ok 23 - uploads over 25 MB are rejected
+  ---
+  duration_ms: 1334.967351
+  ...
+# Subtest: storage paths are server-generated and validated
+ok 24 - storage paths are server-generated and validated
+  ---
+  duration_ms: 21.501647
+  ...
+# Subtest: admin can read the audit log and it contains grants, uploads and denials
+ok 25 - admin can read the audit log and it contains grants, uploads and denials
+  ---
+  duration_ms: 39.732285
+  ...
+# Subtest: the hash chain verifies
+ok 26 - the hash chain verifies
+  ---
+  duration_ms: 25.886723
+  ...
+# Subtest: audit rows cannot be updated or deleted by any client role
+ok 27 - audit rows cannot be updated or deleted by any client role
+  ---
+  duration_ms: 108.628519
+  ...
+# Subtest: denied downloads are recorded with the refusing actor
+ok 28 - denied downloads are recorded with the refusing actor
+  ---
+  duration_ms: 587.900848
+  ...
+# Subtest: search by name, owner, category and date range
+ok 29 - search by name, owner, category and date range
+  ---
+  duration_ms: 187.89683
+  ...
+# Subtest: deactivating a user revokes all their grants immediately
+ok 30 - deactivating a user revokes all their grants immediately
+  ---
+  duration_ms: 2104.158854
+  ...
+# Subtest: suggestions are owner-only and are only suggestions
+ok 31 - suggestions are owner-only and are only suggestions
+  ---
+  duration_ms: 127.229244
+  ...
+1..31
+# tests 31
+# suites 0
+# pass 28
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10563.998375
+
+
+======================================================================
+RUN 2 — node --test tests/integration.test.mjs   (original policy restored)
+======================================================================
+
+TAP version 13
+# Subtest: wrong password is rejected
+ok 1 - wrong password is rejected
+  ---
+  duration_ms: 1086.823
+  ...
+# Subtest: viewer cannot use admin RPCs (verify_audit_chain)
+ok 2 - viewer cannot use admin RPCs (verify_audit_chain)
+  ---
+  duration_ms: 191.53492
+  ...
+# Subtest: viewer cannot list documents they have no grant on
+ok 3 - viewer cannot list documents they have no grant on
+  ---
+  duration_ms: 66.547569
+  ...
+# Subtest: viewer cannot fetch another user's document by id (IDOR)
+ok 4 - viewer cannot fetch another user's document by id (IDOR)
+  ---
+  duration_ms: 67.881382
+  ...
+# Subtest: viewer cannot download another user's document via serve-doc
+ok 5 - viewer cannot download another user's document via serve-doc
+  ---
+  duration_ms: 743.159371
+  ...
+# Subtest: viewer cannot see document versions of ungranted documents
+ok 6 - viewer cannot see document versions of ungranted documents
+  ---
+  duration_ms: 52.538248
+  ...
+# Subtest: viewer cannot read live grants of an ungranted document
+ok 7 - viewer cannot read live grants of an ungranted document
+  ---
+  duration_ms: 51.881714
+  ...
+# Subtest: viewer cannot edit metadata of an ungranted document
+ok 8 - viewer cannot edit metadata of an ungranted document
+  ---
+  duration_ms: 150.707861
+  ...
+# Subtest: viewer cannot delete another user's document
+ok 9 - viewer cannot delete another user's document
+  ---
+  duration_ms: 67.075498
+  ...
+# Subtest: viewer cannot forge an audit entry
+ok 10 - viewer cannot forge an audit entry
+  ---
+  duration_ms: 98.411357
+  ...
+# Subtest: viewer cannot read the audit log
+ok 11 - viewer cannot read the audit log
+  ---
+  duration_ms: 58.752785
+  ...
+# Subtest: viewer cannot escalate their role via profiles
+ok 12 - viewer cannot escalate their role via profiles
+  ---
+  duration_ms: 131.078554
+  ...
+# Subtest: viewer cannot grant themselves access (grant forgery)
+ok 13 - viewer cannot grant themselves access (grant forgery)
+  ---
+  duration_ms: 64.037947
+  ...
+# Subtest: storage objects are not directly downloadable (private bucket, no policies)
+ok 14 - storage objects are not directly downloadable (private bucket, no policies)
+  ---
+  duration_ms: 296.639023
+  ...
+# Subtest: grant → access works; revoke → the very next request is refused
+ok 15 - grant → access works; revoke → the very next request is refused
+  ---
+  duration_ms: 1886.526282
+  ...
+# Subtest: revoked grants cannot be re-activated — a new grant row is required
+ok 16 - revoked grants cannot be re-activated — a new grant row is required
+  ---
+  duration_ms: 160.506206
+  ...
+# Subtest: edit-grant holder can change title but not owner, status or storage path
+ok 17 - edit-grant holder can change title but not owner, status or storage path
+  ---
+  duration_ms: 287.350881
+  ...
+# Subtest: edit-grant holder cannot grant access to others (only the owner can)
+ok 18 - edit-grant holder cannot grant access to others (only the owner can)
+  ---
+  duration_ms: 74.983735
+  ...
+# Subtest: read-only grant holder can download current version but not old ones
+ok 19 - read-only grant holder can download current version but not old ones
+  ---
+  duration_ms: 2304.441696
+  ...
+# Subtest: viewers cannot upload documents
+ok 20 - viewers cannot upload documents
+  ---
+  duration_ms: 380.159577
+  ...
+# Subtest: uploads with disallowed content types are rejected
+ok 21 - uploads with disallowed content types are rejected
+  ---
+  duration_ms: 475.622373
+  ...
+# Subtest: uploads whose magic bytes contradict the declared type are rejected
+ok 22 - uploads whose magic bytes contradict the declared type are rejected
+  ---
+  duration_ms: 270.160458
+  ...
+# Subtest: uploads over 25 MB are rejected
+ok 23 - uploads over 25 MB are rejected
+  ---
+  duration_ms: 2023.992138
+  ...
+# Subtest: storage paths are server-generated and validated
+ok 24 - storage paths are server-generated and validated
+  ---
+  duration_ms: 59.966714
+  ...
+# Subtest: admin can read the audit log and it contains grants, uploads and denials
+ok 25 - admin can read the audit log and it contains grants, uploads and denials
+  ---
+  duration_ms: 70.156094
+  ...
+# Subtest: the hash chain verifies
+ok 26 - the hash chain verifies
+  ---
+  duration_ms: 50.237534
+  ...
+# Subtest: audit rows cannot be updated or deleted by any client role
+ok 27 - audit rows cannot be updated or deleted by any client role
+  ---
+  duration_ms: 118.543015
+  ...
+# Subtest: denied downloads are recorded with the refusing actor
+ok 28 - denied downloads are recorded with the refusing actor
+  ---
+  duration_ms: 683.14196
+  ...
+# Subtest: search by name, owner, category and date range
+ok 29 - search by name, owner, category and date range
+  ---
+  duration_ms: 235.596493
+  ...
+# Subtest: deactivating a user revokes all their grants immediately
+ok 30 - deactivating a user revokes all their grants immediately
+  ---
+  duration_ms: 2647.834498
+  ...
+# Subtest: suggestions are owner-only and are only suggestions
+ok 31 - suggestions are owner-only and are only suggestions
+  ---
+  duration_ms: 136.9121
+  ...
+1..31
+# tests 31
+# suites 0
+# pass 31
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15121.854296

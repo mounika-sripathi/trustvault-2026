@@ -114,7 +114,7 @@ await segment("seg3", 27, async (page) => {
 });
 
 // ---- seg4: grants + suggestions
-await segment("seg4", 33, async (page) => {
+await segment("seg4", 34, async (page) => {
   await login(page, "alice@trustvault.demo", "TrustVault!Alice2026");
   await openDoc(page, "Q4 Salary Letters");
   await page.waitForTimeout(1200);

@@ -65,7 +65,7 @@ exists. Grants are audited.
 **Test:** viewer cannot grant themselves access; edit-holder cannot grant
 others.
 
-### 9. `PATCH /rest/v1/grants?id=eq.<seq>&revoked_at=eq.null&select=seq` — revoke
+### 9. `PATCH /rest/v1/grants?id=eq.<uuid>&revoked_at=is.null` — revoke
 **Authorization:** RLS — only the revoking user may update, and only their own
 revocations; trigger enforces the row is currently live and sets
 `revoked_by` to the caller. Revoked grants are immutable afterwards.
@@ -123,9 +123,10 @@ widen access on its own" rule holds by construction.
 Actions: `create_user`, `deactivate_user`, `activate_user`, `reset_password`,
 `purge_document`.
 **Authorization:** the caller's session is verified as an active **admin
-before the service role key is used** (per-action check). This is the only
-code path that uses the service key, and it is never shipped to the browser.
-`deactivate_user` bulk-revokes all the user's live grants immediately (each
+before the service role key is used** (per-action check). All three edge
+functions hold the service key server-side and never ship it to the browser;
+this is the only one that performs user-administration actions, and each
+action re-verifies the admin first. `deactivate_user` bulk-revokes all the user's live grants immediately (each
 audited).
 **Test:** deactivation revokes all grants immediately (access cut off even
 with a live token).

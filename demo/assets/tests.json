@@ -138,7 +138,11 @@
   },
   {
    "t": "out",
-   "text": "7\nUI smoke: all green (login, filters, upload, grants, audit, admin screens)"
+   "text": "9"
+  },
+  {
+   "t": "out",
+   "text": "\u2502 8       \u2502 'carol sees only granted docs (3)' \u2502 true \u2502\n\u2502 9       \u2502 'audit shows grant.added'          \u2502 true \u2502\n\u2502 10      \u2502 'audit shows doc.uploaded'         \u2502 true \u2502\n\u2502 11      \u2502 'audit shows auth.login'           \u2502 true \u2502\n\u2502 12      \u2502 'chain verification passes'        \u2502 true \u2502\n\u2502 13      \u2502 'users page renders'               \u2502 true \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2518\nUI smoke: all green"
   }
  ]
 }

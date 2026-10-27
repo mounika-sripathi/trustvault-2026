@@ -4,7 +4,7 @@
 
 Documents are only reachable by the people they were granted to — enforced by the
 database on every request, not by the frontend. Every access, including every
-*refused* access, is written to an append-only, hash-chained audit log. Revoking
+*refused* download, is written to an append-only, hash-chained audit log. Revoking
 access takes effect on the person's very next request.
 
 ## Live demo
@@ -44,7 +44,7 @@ plan.
   route: the REST API, the storage API, the edge functions, or direct table
   access. The database decides, every time.
 - **Audit trail** of uploads, downloads, changes, deletions, permission changes,
-  logins and refused attempts — append-only and hash-chained, with an admin
+  logins and refused download attempts — append-only and hash-chained, with an admin
   "verify chain" function.
 - **Upload validation**: content-type allowlist, magic-byte sniffing, size cap,
   server-generated storage paths.

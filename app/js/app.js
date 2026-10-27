@@ -616,7 +616,7 @@ async function renderAudit(view) {
             ? `<span class="chip chip-denied">${esc(a.action)}</span>` : `<span class="chip chip-cat">${esc(a.action)}</span>`}</td>
           <td>${esc(a.document_title || "—")}</td>
           <td class="muted">${esc(a.target_email || "—")}</td>
-          <td class="mono" style="font-size:11.5px;max-width:260px;overflow-wrap:anywhere">${esc(JSON.stringify(a.detail ?? {}))}</td>
+          <td class="mono" style="font-size:11.5px;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(JSON.stringify(a.detail ?? {}))}">${esc(JSON.stringify(a.detail ?? {}))}</td>
           <td class="mono muted">${esc(a.ip || "—")}</td>
         </tr>`).join("")}</tbody>
       </table>`;

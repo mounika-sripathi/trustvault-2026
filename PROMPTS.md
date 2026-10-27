@@ -17,7 +17,7 @@ actually happened during that session. Nothing here is backdated.
 
 ## Entries
 
-### Entry 1 — Designing the permission model
+### Entry 1 — October 27, 2026 — Designing the permission model
 
 **What I asked:** "Design the permission model for a document platform. Rules:
 a document is reachable only through a grant the owner gave; every route — API,
@@ -37,7 +37,7 @@ auditing downloads meaningless and complicated revocation. I pushed it toward
 "RLS + private bucket + streaming function", which is what got built.
 
 
-### Entry 2 — Initial schema and RLS policies
+### Entry 2 — October 27, 2026 — Initial schema and RLS policies
 
 **What I asked:** "Write the migrations: documents, grants, profiles,
 audit_log with hash chaining, plus RLS policies for owners, admins, and grant
@@ -56,7 +56,7 @@ schema to `tv_internal`, revoked the accidental grants, and pinned
 notice the collision on its own.
 
 
-### Entry 3 — Edge functions and the upload pipeline
+### Entry 3 — October 27, 2026 — Edge functions and the upload pipeline
 
 **What I asked:** "Write the upload-doc edge function: auth check, owner or
 edit grant check, content-type allowlist, magic-byte sniffing, 25MB cap, safe
@@ -73,7 +73,7 @@ and refused return the same 404" rule — the AI's first draft leaked which
 documents exist.
 
 
-### Entry 4 — AI bug caught: `digest()` not resolving in SECURITY DEFINER context
+### Entry 4 — October 27, 2026 — AI bug caught: `digest()` not resolving in SECURITY DEFINER context
 
 **Prompt:** "Fix this error: SQLSTATE 42883 function digest(text, unknown) does
 not exist — it only happens inside the audit writer."
@@ -90,7 +90,7 @@ was being resolved with an ambiguous argument type.
 error I caught; the original approach was the AI's suggestion.
 
 
-### Entry 5 — Seed users and GoTrue
+### Entry 5 — October 27, 2026 — Seed users and GoTrue
 
 **What I asked:** "Seed the demo accounts — one owner, two more, an admin —
 with real bcrypt password hashes. Roles must live in profiles, not in the JWT."
@@ -109,7 +109,7 @@ empty strings for `confirmation_token`, `recovery_token` and the
 The AI would have shipped a broken login.
 
 
-### Entry 6 — The UI, and a state leak
+### Entry 6 — October 27, 2026 — The UI, and a state leak
 
 **What I asked:** "Build the single-page app: login, document list with
 filters, upload form, grants management, audit log viewer for admins, and an
@@ -126,7 +126,7 @@ strings mangled by the generation process, which would have broken text
 rendering.
 
 
-### Entry 7 — The suggestion trap, and defense-in-depth backfiring
+### Entry 7 — October 27, 2026 — The suggestion trap, and defense-in-depth backfiring
 
 **Prompt:** "Add suggest_access for owners: based on prior activity, suggest
 who might need access. The AI must never be able to widen access on its own —
@@ -147,7 +147,7 @@ remove the security control that's inconvenient — and it's why the
 authorization before the key is used.
 
 
-### Entry 8 — Test hardening (the "take one check out" test)
+### Entry 8 — October 27, 2026 — Test hardening (the "take one check out" test)
 
 **What I asked:** "Write integration tests covering: grant → access →
 revoke → immediate refusal; every cross-user denial route (list, fetch, versions,
@@ -168,7 +168,7 @@ additionally attempt updates through every role and assert they fail with
 RLS errors. These tests are the ones that would catch a removed
 authorization check.
 
-### Entry 9 — The last-mile audit review
+### Entry 9 — October 27, 2026 — The last-mile audit review
 
 **Prompt:** "Review the whole codebase for authorization holes: any route that
 checks a grant, any place a client role can reach storage, any way to widen
@@ -179,7 +179,7 @@ referenced a table in a way that required a broad policy — and confirmed the
 rest of the surfaces were closed. I also had it re-verify that the storage
 bucket exposes no client policies at all.
 
-### Entry 10 — Deployment and demo
+### Entry 10 — October 27, 2026 — Deployment and demo
 
 **What I asked:** deploy the app (single static page + edge functions), write
 THREATS.md / API.md / DESIGN.md, and record the demo.
